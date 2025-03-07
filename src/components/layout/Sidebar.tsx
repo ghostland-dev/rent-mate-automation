@@ -13,8 +13,11 @@ import {
   MessageSquare, 
   Settings, 
   BarChart, 
-  Wrench 
+  Wrench,
+  CreditCard,
+  ShieldCheck
 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 interface SidebarItemProps {
   icon: React.ElementType;
@@ -47,6 +50,7 @@ const SidebarItem = ({ icon: Icon, title, path, isCollapsed }: SidebarItemProps)
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { user } = useAuth();
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -60,8 +64,16 @@ const Sidebar = () => {
     { title: "Maintenance", icon: Wrench, path: "/maintenance" },
     { title: "Documents", icon: FileText, path: "/documents" },
     { title: "Messages", icon: MessageSquare, path: "/messages" },
-    { title: "Paramètres", icon: Settings, path: "/settings" },
+    { title: "Abonnement", icon: CreditCard, path: "/subscription" },
   ];
+
+  // Add admin link for admins and superadmins
+  if (user?.role === "admin" || user?.role === "superadmin") {
+    menuItems.push({ title: "Administration", icon: ShieldCheck, path: "/admin" });
+  }
+
+  // Add settings as the last item
+  menuItems.push({ title: "Paramètres", icon: Settings, path: "/settings" });
 
   return (
     <aside
