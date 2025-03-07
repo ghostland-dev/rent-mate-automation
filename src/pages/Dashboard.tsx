@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { 
   Euro, 
   Home, 
@@ -34,7 +34,6 @@ import {
   Legend,
 } from "recharts";
 
-// Données fictives pour le tableau de bord
 const cashflowData = [
   { month: "Jan", revenus: 6000, dépenses: 4000 },
   { month: "Fév", revenus: 5500, dépenses: 3800 },
@@ -162,9 +161,11 @@ const Dashboard = () => {
             Bienvenue sur votre tableau de bord de gestion immobilière.
           </p>
         </div>
-        <Button className="animate-fade-in shadow-sm">
-          + Ajouter une propriété
-        </Button>
+        <Link to="/properties">
+          <Button className="animate-fade-in shadow-sm">
+            + Ajouter une propriété
+          </Button>
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -275,9 +276,11 @@ const Dashboard = () => {
                 <PropertyCard key={property.id} property={property} />
               ))}
             </div>
-            <Button variant="outline" className="mt-6 w-full">
-              Voir toutes les propriétés
-            </Button>
+            <Link to="/properties">
+              <Button variant="outline" className="mt-6 w-full">
+                Voir toutes les propriétés
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 

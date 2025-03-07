@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Properties from "./pages/Properties";
+import PropertyDetail from "./pages/PropertyDetail";
 import Tenants from "./pages/Tenants";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
               <Route path="properties" element={<Properties />} />
+              <Route path="properties/:id" element={<PropertyDetail />} />
               <Route path="tenants" element={<Tenants />} />
               <Route path="subscription" element={<Subscription />} />
               <Route path="admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
