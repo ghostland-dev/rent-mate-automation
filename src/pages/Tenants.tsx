@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -21,8 +20,9 @@ const Tenants = () => {
     setIsAddDialogOpen,
     selectedTenant,
     setSelectedTenant,
+    updateSelectedTenant,
     newTenant,
-    setNewTenant,
+    updateNewTenant,
     handleAddTenant,
     handleEditTenant,
     handleDeleteTenant
@@ -79,7 +79,7 @@ const Tenants = () => {
           </DialogHeader>
           <TenantForm 
             tenant={newTenant}
-            setTenant={setNewTenant}
+            setTenant={updateNewTenant}
             onSubmit={handleAddTenant}
           />
         </DialogContent>
@@ -94,7 +94,7 @@ const Tenants = () => {
           {selectedTenant && (
             <TenantForm 
               tenant={selectedTenant}
-              setTenant={setSelectedTenant}
+              setTenant={updateSelectedTenant}
               onSubmit={handleEditTenant}
               isEditing
             />

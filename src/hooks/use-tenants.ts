@@ -22,6 +22,18 @@ export const useTenants = () => {
   
   const { toast } = useToast();
 
+  // Update selectedTenant to handle partial updates
+  const updateSelectedTenant = (updatedFields: Partial<Tenant>) => {
+    if (selectedTenant) {
+      setSelectedTenant({ ...selectedTenant, ...updatedFields });
+    }
+  };
+
+  // Update newTenant
+  const updateNewTenant = (updatedFields: Partial<Tenant>) => {
+    setNewTenant({ ...newTenant, ...updatedFields });
+  };
+
   // Filter tenants based on search query and active tab
   const filteredTenants = tenants.filter((tenant) => {
     const matchesSearch = tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -120,8 +132,10 @@ export const useTenants = () => {
     setIsAddDialogOpen,
     selectedTenant,
     setSelectedTenant,
+    updateSelectedTenant,
     newTenant,
     setNewTenant,
+    updateNewTenant,
     handleAddTenant,
     handleEditTenant,
     handleDeleteTenant

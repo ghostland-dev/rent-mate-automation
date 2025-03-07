@@ -22,7 +22,7 @@ export const TenantForm = ({ tenant, setTenant, onSubmit, isEditing = false }: T
             <Input
               id={`${isEditing ? 'edit-' : ''}name`}
               value={tenant.name || ''}
-              onChange={(e) => setTenant({...tenant, name: e.target.value})}
+              onChange={(e) => setTenant({name: e.target.value})}
               placeholder="Nom et prénom"
             />
           </div>
@@ -31,7 +31,7 @@ export const TenantForm = ({ tenant, setTenant, onSubmit, isEditing = false }: T
             <Input
               id={`${isEditing ? 'edit-' : ''}property`}
               value={tenant.property || ''}
-              onChange={(e) => setTenant({...tenant, property: e.target.value})}
+              onChange={(e) => setTenant({property: e.target.value})}
               placeholder="Adresse du logement"
             />
           </div>
@@ -41,7 +41,7 @@ export const TenantForm = ({ tenant, setTenant, onSubmit, isEditing = false }: T
               id={`${isEditing ? 'edit-' : ''}email`}
               type="email"
               value={tenant.email || ''}
-              onChange={(e) => setTenant({...tenant, email: e.target.value})}
+              onChange={(e) => setTenant({email: e.target.value})}
               placeholder="email@exemple.com"
             />
           </div>
@@ -50,7 +50,7 @@ export const TenantForm = ({ tenant, setTenant, onSubmit, isEditing = false }: T
             <Input
               id={`${isEditing ? 'edit-' : ''}phone`}
               value={tenant.phone || ''}
-              onChange={(e) => setTenant({...tenant, phone: e.target.value})}
+              onChange={(e) => setTenant({phone: e.target.value})}
               placeholder="06 xx xx xx xx"
             />
           </div>
@@ -60,7 +60,7 @@ export const TenantForm = ({ tenant, setTenant, onSubmit, isEditing = false }: T
               id={`${isEditing ? 'edit-' : ''}moveInDate`}
               type="date"
               value={tenant.moveInDate || ''}
-              onChange={(e) => setTenant({...tenant, moveInDate: e.target.value})}
+              onChange={(e) => setTenant({moveInDate: e.target.value})}
             />
           </div>
           <div className="space-y-2">
@@ -69,7 +69,7 @@ export const TenantForm = ({ tenant, setTenant, onSubmit, isEditing = false }: T
               id={`${isEditing ? 'edit-' : ''}leaseEnd`}
               type="date"
               value={tenant.leaseEnd || ''}
-              onChange={(e) => setTenant({...tenant, leaseEnd: e.target.value})}
+              onChange={(e) => setTenant({leaseEnd: e.target.value})}
             />
           </div>
           <div className="space-y-2">
@@ -78,7 +78,7 @@ export const TenantForm = ({ tenant, setTenant, onSubmit, isEditing = false }: T
               id={`${isEditing ? 'edit-' : ''}rentAmount`}
               type="number"
               value={tenant.rentAmount?.toString() || ''}
-              onChange={(e) => setTenant({...tenant, rentAmount: parseFloat(e.target.value) || 0})}
+              onChange={(e) => setTenant({rentAmount: parseFloat(e.target.value) || 0})}
               min="0"
               step="50"
             />
@@ -90,7 +90,7 @@ export const TenantForm = ({ tenant, setTenant, onSubmit, isEditing = false }: T
                 id="edit-status"
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 value={tenant.status}
-                onChange={(e) => setTenant({...tenant, status: e.target.value as TenantStatus})}
+                onChange={(e) => setTenant({status: e.target.value as TenantStatus})}
               >
                 <option value="active">Actif</option>
                 <option value="pending">En attente</option>
