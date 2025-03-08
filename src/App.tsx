@@ -11,6 +11,7 @@ import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
 import AddProperty from "./pages/AddProperty";
 import Tenants from "./pages/Tenants";
+import Maintenance from "./pages/Maintenance";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -41,11 +42,11 @@ const App = () => (
               <Route path="properties/:id" element={<PropertyDetail />} />
               <Route path="properties/add" element={<AddProperty />} />
               <Route path="tenants" element={<Tenants />} />
+              <Route path="maintenance" element={<Maintenance />} />
               <Route path="subscription" element={<Subscription />} />
               <Route path="admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
               <Route path="documents" element={<Documents />} />
               <Route path="payments" element={<Dashboard />} />
-              <Route path="maintenance" element={<Dashboard />} />
               <Route path="settings" element={<Dashboard />} />
               <Route path="messages" element={<Dashboard />} />
             </Route>
