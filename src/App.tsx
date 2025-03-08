@@ -15,6 +15,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Subscription from "./pages/Subscription";
 import AdminDashboard from "./pages/AdminDashboard";
+import Documents from "./pages/Documents";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
 
@@ -40,11 +41,11 @@ const App = () => (
               <Route path="tenants" element={<Tenants />} />
               <Route path="subscription" element={<Subscription />} />
               <Route path="admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+              <Route path="documents" element={<Documents />} />
               <Route path="payments" element={<Dashboard />} />
               <Route path="maintenance" element={<Dashboard />} />
-              <Route path="documents" element={<Dashboard />} />
-              <Route path="messages" element={<Dashboard />} />
               <Route path="settings" element={<Dashboard />} />
+              <Route path="messages" element={<Dashboard />} />
             </Route>
             
             {/* Redirect to login */}
