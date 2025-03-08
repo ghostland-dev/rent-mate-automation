@@ -109,9 +109,11 @@ const Properties = () => {
             Gérez toutes vos propriétés en un seul endroit.
           </p>
         </div>
-        <Button className="shadow-sm flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Ajouter une propriété
+        <Button className="shadow-sm flex items-center gap-2" asChild>
+          <Link to="/properties/add">
+            <Plus className="h-4 w-4" />
+            Ajouter une propriété
+          </Link>
         </Button>
       </div>
 
@@ -162,9 +164,11 @@ const Properties = () => {
                 <p className="mt-2 text-sm text-muted-foreground">
                   Essayez de modifier vos critères de recherche ou ajoutez une nouvelle propriété.
                 </p>
-                <Button className="mt-4">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Ajouter une propriété
+                <Button className="mt-4" asChild>
+                  <Link to="/properties/add">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Ajouter une propriété
+                  </Link>
                 </Button>
               </div>
             ) : (

@@ -1,19 +1,23 @@
-
 import { useState } from "react";
 import { 
+  Plus, 
+  Search, 
+  Grid, 
+  List, 
   FileIcon, 
-  FileTextIcon, 
-  ImageIcon, 
-  FileSpreadsheetIcon, 
-  FilePdfIcon,
-  PlusIcon,
-  SearchIcon,
-  FolderIcon
+  Upload,
+  Filter
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DocumentList from "@/components/documents/DocumentList";
 import UploadDocumentDialog from "@/components/documents/UploadDocumentDialog";
 
@@ -108,14 +112,12 @@ const Documents = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
-  // Filtrer les documents en fonction de la recherche et de la catégorie
   const filteredDocuments = documents.filter((doc) => {
     const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "all" || doc.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
 
-  // Catégories de documents
   const categories = [
     { id: "all", name: "Tous les documents" },
     { id: "contrats", name: "Contrats" },
@@ -147,7 +149,7 @@ const Documents = () => {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center relative w-full sm:w-96">
-          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Rechercher un document..."
             value={searchQuery}
@@ -156,7 +158,7 @@ const Documents = () => {
           />
         </div>
         <Button onClick={() => setIsUploadDialogOpen(true)} className="flex items-center gap-2">
-          <PlusIcon className="h-4 w-4" />
+          <Plus className="h-4 w-4" />
           Ajouter un document
         </Button>
       </div>
@@ -176,7 +178,7 @@ const Documents = () => {
                       : "hover:bg-muted"
                   }`}
                 >
-                  <FolderIcon className="h-4 w-4" />
+                  <Filter className="h-4 w-4" />
                   {category.name}
                 </button>
               ))}
