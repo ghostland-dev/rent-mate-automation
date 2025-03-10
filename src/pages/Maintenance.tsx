@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { PlusCircle, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ import MaintenanceFilters from "@/components/maintenance/MaintenanceFilters";
 import { MaintenanceTicket, MaintenancePriority, MaintenanceStatus } from "@/types/maintenance";
 import { useToast } from "@/hooks/use-toast";
 
-// Données fictives pour les tickets de maintenance
 const MOCK_TICKETS: MaintenanceTicket[] = [
   {
     id: "ticket1",
@@ -132,7 +130,6 @@ const Maintenance = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Simuler le chargement des données
     setIsLoading(true);
     setTimeout(() => {
       setTickets(MOCK_TICKETS);
@@ -150,7 +147,6 @@ const Maintenance = () => {
   }) => {
     let filtered = [...tickets];
 
-    // Filtrer par recherche
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       filtered = filtered.filter(
@@ -161,22 +157,18 @@ const Maintenance = () => {
       );
     }
 
-    // Filtrer par statut
     if (filters.status !== "all") {
       filtered = filtered.filter((ticket) => ticket.status === filters.status);
     }
 
-    // Filtrer par priorité
     if (filters.priority !== "all") {
       filtered = filtered.filter((ticket) => ticket.priority === filters.priority);
     }
 
-    // Filtrer par catégorie
     if (filters.category !== "all") {
       filtered = filtered.filter((ticket) => ticket.category === filters.category);
     }
 
-    // Filtrer par propriété
     if (filters.propertyId !== "all") {
       filtered = filtered.filter((ticket) => ticket.propertyId === filters.propertyId);
     }
@@ -195,7 +187,6 @@ const Maintenance = () => {
   };
 
   const handleCreateTicket = (data: any) => {
-    // Dans une vraie application, envoyer les données au serveur
     const newTicket: MaintenanceTicket = {
       id: `ticket${tickets.length + 1}`,
       title: data.title,
@@ -207,13 +198,12 @@ const Maintenance = () => {
       priority: data.priority,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      reportedBy: "Admin", // Dans une vraie application, utiliser l'utilisateur actuel
+      reportedBy: "Admin",
       category: data.category,
       estimatedCost: data.estimatedCost,
       images: data.images,
     };
 
-    // Ajouter le nouveau ticket à la liste
     setTickets([newTicket, ...tickets]);
     setFilteredTickets([newTicket, ...filteredTickets]);
     setIsCreating(false);
@@ -226,7 +216,6 @@ const Maintenance = () => {
   const handleUpdateTicket = (data: any) => {
     if (!selectedTicket) return;
 
-    // Dans une vraie application, envoyer les données au serveur
     const updatedTicket: MaintenanceTicket = {
       ...selectedTicket,
       title: data.title,
@@ -242,7 +231,6 @@ const Maintenance = () => {
       images: data.images,
     };
 
-    // Mettre à jour le ticket dans la liste
     const updatedTickets = tickets.map((ticket) =>
       ticket.id === selectedTicket.id ? updatedTicket : ticket
     );
@@ -263,7 +251,6 @@ const Maintenance = () => {
   const handleDeleteTicket = () => {
     if (!selectedTicket) return;
 
-    // Dans une vraie application, envoyer une requête au serveur
     const updatedTickets = tickets.filter((ticket) => ticket.id !== selectedTicket.id);
     setTickets(updatedTickets);
     setFilteredTickets(filteredTickets.filter((ticket) => ticket.id !== selectedTicket.id));
@@ -274,7 +261,6 @@ const Maintenance = () => {
     });
   };
 
-  // Données fictives pour les propriétés
   const properties = [
     { id: "prop1", name: "Résidence Les Oliviers" },
     { id: "prop2", name: "Villa Méditerranée" },
@@ -292,12 +278,11 @@ const Maintenance = () => {
     );
   }
 
-  // Si un ticket est sélectionné, afficher les détails
   if (selectedTicket && !isEditing) {
     return (
       <MaintenanceTicketDetail
         ticket={selectedTicket}
-        onEdit={() => setIsEditing(true)}
+        onUpdate={handleUpdateTicket}
         onDelete={handleDeleteTicket}
         onClose={() => setSelectedTicket(null)}
       />
@@ -456,7 +441,6 @@ const Maintenance = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Modal pour créer un ticket */}
       <Dialog open={isCreating} onOpenChange={setIsCreating}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -469,7 +453,6 @@ const Maintenance = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Modal pour modifier un ticket */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>

@@ -3,6 +3,17 @@ export type MaintenanceStatus = 'pending' | 'in_progress' | 'scheduled' | 'compl
 
 export type MaintenancePriority = 'low' | 'medium' | 'high' | 'urgent';
 
+export type Attachment = {
+  name: string;
+  url: string;
+};
+
+export type Assignee = {
+  id: string;
+  name: string;
+  avatar?: string;
+};
+
 export type MaintenanceTicket = {
   id: string;
   title: string;
@@ -14,12 +25,13 @@ export type MaintenanceTicket = {
   priority: MaintenancePriority;
   createdAt: string;
   updatedAt: string;
-  assignedTo?: string;
+  assignedTo?: Assignee;
   reportedBy: string;
   estimatedCost?: number;
   actualCost?: number;
   category: string;
   images?: string[];
+  attachments?: Attachment[];
   comments?: {
     id: string;
     text: string;

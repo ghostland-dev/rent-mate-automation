@@ -1,4 +1,4 @@
-// Importations et début du composant restent identiques, mais je vais corriger les erreurs de typage avec Badge
+
 import {
   AlertTriangle,
   Clock,
@@ -13,6 +13,8 @@ import {
   XCircle,
   Loader2,
   Paperclip,
+  MoreVertical,
+  ArrowRight,
 } from "lucide-react";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
@@ -27,6 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
@@ -39,13 +42,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
 import { MaintenanceTicket } from "@/types/maintenance";
 
 interface MaintenanceTicketDetailProps {
   ticket: MaintenanceTicket;
   onUpdate: (ticket: MaintenanceTicket) => void;
   onDelete: (id: string) => void;
+  onClose?: () => void;
 }
 
 const statusOptions = [
@@ -72,7 +75,7 @@ const categoryOptions = [
   { value: "other", label: "Autre" },
 ];
 
-const MaintenanceTicketDetail = ({ ticket, onUpdate, onDelete }: MaintenanceTicketDetailProps) => {
+const MaintenanceTicketDetail = ({ ticket, onUpdate, onDelete, onClose }: MaintenanceTicketDetailProps) => {
   const { user } = useAuth();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -238,25 +241,33 @@ const MaintenanceTicketDetail = ({ ticket, onUpdate, onDelete }: MaintenanceTick
     <Card className="w-full overflow-hidden shadow-md">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg">{ticket.title}</CardTitle>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Ouvrir le menu</span>
-              <MoreVertical className="h-4 w-4" />
+        <div className="flex items-center gap-2">
+          {onClose && (
+            <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
+              <span className="sr-only">Fermer</span>
+              <ArrowRight className="h-4 w-4" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
-              <Edit className="mr-2 h-4 w-4" />
-              Modifier
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-destructive focus:bg-destructive/10">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Supprimer
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Ouvrir le menu</span>
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Modifier
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-destructive focus:bg-destructive/10">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Supprimer
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </CardHeader>
       <CardContent className="pb-2">
         <ScrollArea className="h-[450px] w-full pr-2">
@@ -299,10 +310,6 @@ const MaintenanceTicketDetail = ({ ticket, onUpdate, onDelete }: MaintenanceTick
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Status</Label>
-                  {/* Modifier les Badges qui ont la propriété size incorrecte (lignes 138 et 142)
-                  Au lieu de:
-                  <Badge className={getStatusColor(ticket.status)} size="lg">
-                  Utilisez: */}
                   <Badge className={`${getStatusColor(ticket.status)} px-3 py-1.5 text-sm`}>
                     <Clock className="mr-1.5 h-4 w-4" />
                     {getStatusText(ticket.status)}
@@ -310,9 +317,6 @@ const MaintenanceTicketDetail = ({ ticket, onUpdate, onDelete }: MaintenanceTick
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Priorité</Label>
-                  {/* Et au lieu de:
-                  <Badge className={getPriorityColor(ticket.priority)} size="lg">
-                  Utilisez: */}
                   <Badge className={`${getPriorityColor(ticket.priority)} px-3 py-1.5 text-sm`}>
                     <AlertTriangle className="mr-1.5 h-4 w-4" />
                     {getPriorityText(ticket.priority)}
