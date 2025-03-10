@@ -14,6 +14,13 @@ export type Assignee = {
   avatar?: string;
 };
 
+export type Comment = {
+  id: string;
+  text: string;
+  author: string;
+  createdAt: string;
+};
+
 export type MaintenanceTicket = {
   id: string;
   title: string;
@@ -32,12 +39,7 @@ export type MaintenanceTicket = {
   category: string;
   images?: string[];
   attachments?: Attachment[];
-  comments?: {
-    id: string;
-    text: string;
-    author: string;
-    createdAt: string;
-  }[];
+  comments?: Comment[];
 };
 
 export const MAINTENANCE_CATEGORIES = [

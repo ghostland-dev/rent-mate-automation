@@ -13,6 +13,8 @@ import TicketDetails from "./TicketDetails";
 import TicketAssignee from "./TicketAssignee";
 import TicketAttachments from "./TicketAttachments";
 import TicketActions from "./TicketActions";
+import TicketComments from "./TicketComments";
+import TicketParameters from "./TicketParameters";
 import EditTicketDialog from "./EditTicketDialog";
 import DeleteTicketDialog from "./DeleteTicketDialog";
 
@@ -34,6 +36,7 @@ const MaintenanceTicketDetail = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [activeTab, setActiveTab] = useState<'details' | 'messages' | 'parameters'>('details');
 
   const handleCompleteTicket = async () => {
     setIsCompleting(true);
@@ -97,6 +100,57 @@ const MaintenanceTicketDetail = ({
     }
   };
 
+  const handleAddComment = async (commentText: string) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const newComment = {
+        id: `comment${Date.now()}`,
+        text: commentText,
+        author: user?.name || "Admin",
+        createdAt: new Date().toISOString(),
+      };
+      
+      const updatedComments = [
+        ...(ticket.comments || []),
+        newComment
+      ];
+      
+      onUpdate({
+        ...ticket,
+        comments: updatedComments,
+      });
+      
+      toast({
+        description: "Votre message a été ajouté.",
+      });
+      
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'ajout du message.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateParameters = async (updates: Partial<MaintenanceTicket>) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      onUpdate({
+        ...ticket,
+        ...updates,
+      });
+      
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return (
     <Card className="w-full overflow-hidden shadow-md">
       <TicketHeader 
@@ -106,33 +160,76 @@ const MaintenanceTicketDetail = ({
         onClose={onClose}
       />
 
+      <div className="border-b">
+        <div className="flex">
+          <button
+            className={`px-4 py-2 text-sm font-medium ${activeTab === 'details' ? 'border-b-2 border-primary' : 'text-muted-foreground'}`}
+            onClick={() => setActiveTab('details')}
+          >
+            Détails
+          </button>
+          <button
+            className={`px-4 py-2 text-sm font-medium ${activeTab === 'messages' ? 'border-b-2 border-primary' : 'text-muted-foreground'}`}
+            onClick={() => setActiveTab('messages')}
+          >
+            Messages {ticket.comments && ticket.comments.length > 0 && `(${ticket.comments.length})`}
+          </button>
+          <button
+            className={`px-4 py-2 text-sm font-medium ${activeTab === 'parameters' ? 'border-b-2 border-primary' : 'text-muted-foreground'}`}
+            onClick={() => setActiveTab('parameters')}
+          >
+            Paramètres
+          </button>
+        </div>
+      </div>
+
       <CardContent className="pb-2">
         <ScrollArea className="h-[450px] w-full pr-2">
-          <div className="space-y-4">
-            <TicketBasicInfo
-              propertyName={ticket.propertyName}
-              unit={ticket.unit}
-              category={ticket.category}
-              reportedBy={ticket.reportedBy}
-            />
-            <Separator />
-            <TicketDescription description={ticket.description} />
-            <Separator />
-            <TicketDetails
-              createdAt={ticket.createdAt}
-              estimatedCost={ticket.estimatedCost}
-              status={ticket.status}
-              priority={ticket.priority}
-            />
-            <Separator />
-            <TicketAssignee assignedTo={ticket.assignedTo} />
-            {ticket.attachments && ticket.attachments.length > 0 && (
-              <>
-                <Separator />
-                <TicketAttachments attachments={ticket.attachments} />
-              </>
-            )}
-          </div>
+          {activeTab === 'details' && (
+            <div className="space-y-4">
+              <TicketBasicInfo
+                propertyName={ticket.propertyName}
+                unit={ticket.unit}
+                category={ticket.category}
+                reportedBy={ticket.reportedBy}
+              />
+              <Separator />
+              <TicketDescription description={ticket.description} />
+              <Separator />
+              <TicketDetails
+                createdAt={ticket.createdAt}
+                estimatedCost={ticket.estimatedCost}
+                status={ticket.status}
+                priority={ticket.priority}
+              />
+              <Separator />
+              <TicketAssignee assignedTo={ticket.assignedTo} />
+              {ticket.attachments && ticket.attachments.length > 0 && (
+                <>
+                  <Separator />
+                  <TicketAttachments attachments={ticket.attachments} />
+                </>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'messages' && (
+            <div className="py-4">
+              <TicketComments
+                ticket={ticket}
+                onAddComment={handleAddComment}
+              />
+            </div>
+          )}
+
+          {activeTab === 'parameters' && (
+            <div className="py-4">
+              <TicketParameters
+                ticket={ticket}
+                onUpdateParameters={handleUpdateParameters}
+              />
+            </div>
+          )}
         </ScrollArea>
       </CardContent>
 

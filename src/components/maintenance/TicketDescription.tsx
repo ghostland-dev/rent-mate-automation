@@ -9,7 +9,9 @@ const TicketDescription = ({ description }: TicketDescriptionProps) => {
   return (
     <div className="space-y-2">
       <h4 className="text-sm font-medium">Description</h4>
-      <p className="text-sm text-muted-foreground">{description}</p>
+      <div className="bg-muted/50 p-3 rounded-md">
+        <p className="text-sm whitespace-pre-line">{description}</p>
+      </div>
     </div>
   );
 };
