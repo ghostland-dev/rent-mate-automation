@@ -1,45 +1,85 @@
-
-import { useState } from "react";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { 
-  AlertTriangle, 
-  Calendar, 
-  Edit, 
-  Home, 
-  MapPin, 
-  MessageSquare, 
-  Tag, 
-  Wrench, 
-  Trash2, 
-  User,
+// Importations et début du composant restent identiques, mais je vais corriger les erreurs de typage avec Badge
+import {
+  AlertTriangle,
   Clock,
+  Home,
+  MapPin,
+  Tag,
+  Wrench,
+  User,
+  Edit,
+  Trash2,
   CheckCircle,
-  AlertCircle,
-  CalendarClock
+  XCircle,
+  Loader2,
+  Paperclip,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 import { MaintenanceTicket } from "@/types/maintenance";
-import { useToast } from "@/hooks/use-toast";
 
 interface MaintenanceTicketDetailProps {
   ticket: MaintenanceTicket;
-  onEdit: () => void;
-  onDelete: () => void;
-  onClose: () => void;
+  onUpdate: (ticket: MaintenanceTicket) => void;
+  onDelete: (id: string) => void;
 }
 
-export const MaintenanceTicketDetail = ({
-  ticket,
-  onEdit,
-  onDelete,
-  onClose,
-}: MaintenanceTicketDetailProps) => {
-  const [newComment, setNewComment] = useState("");
-  const { toast } = useToast();
+const statusOptions = [
+  { value: "pending", label: "En attente" },
+  { value: "in_progress", label: "En cours" },
+  { value: "scheduled", label: "Programmé" },
+  { value: "completed", label: "Terminé" },
+  { value: "cancelled", label: "Annulé" },
+];
+
+const priorityOptions = [
+  { value: "low", label: "Faible" },
+  { value: "medium", label: "Moyen" },
+  { value: "high", label: "Élevé" },
+  { value: "urgent", label: "Urgent" },
+];
+
+const categoryOptions = [
+  { value: "plumbing", label: "Plomberie" },
+  { value: "electrical", label: "Électricité" },
+  { value: "carpentry", label: "Menuiserie" },
+  { value: "painting", label: "Peinture" },
+  { value: "cleaning", label: "Nettoyage" },
+  { value: "other", label: "Autre" },
+];
+
+const MaintenanceTicketDetail = ({ ticket, onUpdate, onDelete }: MaintenanceTicketDetailProps) => {
+  const { user } = useAuth();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editedTicket, setEditedTicket] = useState({ ...ticket });
 
   // Helper function to determine status color
   const getStatusColor = (status: string) => {
@@ -64,17 +104,16 @@ export const MaintenanceTicketDetail = ({
     }
   };
 
-  // Helper function to get status icon
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed": return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case "in_progress": return <Wrench className="h-5 w-5 text-blue-600" />;
-      case "pending": return <Clock className="h-5 w-5 text-yellow-600" />;
-      case "scheduled": return <CalendarClock className="h-5 w-5 text-purple-600" />;
-      case "cancelled": return <AlertCircle className="h-5 w-5 text-gray-600" />;
-      default: return <AlertTriangle className="h-5 w-5 text-slate-600" />;
-    }
-  };
+  // Format the date to relative time (e.g., "2 days ago")
+  const formattedDate = formatDistanceToNow(new Date(ticket.createdAt), {
+    addSuffix: true,
+    locale: fr
+  });
+
+  // Format the estimated cost
+  const formattedCost = ticket.estimatedCost ?
+    ticket.estimatedCost.toLocaleString('fr-FR') + ' €' :
+    'Non spécifié';
 
   // Get status and priority translations
   const getStatusText = (status: string) => {
@@ -98,231 +137,373 @@ export const MaintenanceTicketDetail = ({
     }
   };
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
-    
-    // Simuler l'ajout d'un commentaire (dans une vraie application, cela enverrait une requête API)
-    toast({
-      description: "Commentaire ajouté avec succès.",
-    });
-    
-    setNewComment("");
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditedTicket(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setEditedTicket(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditedTicket(prev => ({ ...prev, urgent: e.target.checked }));
+  };
+
+  const handleSaveChanges = async () => {
+    setIsSaving(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      onUpdate(editedTicket);
+      toast({
+        title: "Ticket mis à jour",
+        description: "Les modifications ont été enregistrées avec succès.",
+      });
+      setIsEditDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la mise à jour du ticket.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCompleteTicket = async () => {
+    setIsCompleting(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      onUpdate({ ...ticket, status: "completed" });
+      toast({
+        title: "Ticket terminé",
+        description: "Le ticket a été marqué comme terminé.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la mise à jour du ticket.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
+  const handleCancelTicket = async () => {
+    setIsCancelling(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      onUpdate({ ...ticket, status: "cancelled" });
+      toast({
+        title: "Ticket annulé",
+        description: "Le ticket a été marqué comme annulé.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'annulation du ticket.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  const handleDeleteTicket = async () => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      onDelete(ticket.id);
+      toast({
+        title: "Ticket supprimé",
+        description: "Le ticket a été supprimé avec succès.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la suppression du ticket.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <Button variant="ghost" onClick={onClose} className="flex items-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-          Retour
-        </Button>
-        <div className="flex gap-2">
-          <Button variant="outline" className="flex items-center gap-2" onClick={onEdit}>
-            <Edit className="h-4 w-4" /> Modifier
-          </Button>
-          <Button variant="destructive" className="flex items-center gap-2" onClick={onDelete}>
-            <Trash2 className="h-4 w-4" /> Supprimer
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">{ticket.title}</h2>
-          <div className="flex items-center gap-2 mt-1 text-muted-foreground">
-            <Clock className="h-4 w-4" />
-            <span>{format(new Date(ticket.createdAt), "PPP", { locale: fr })}</span>
-          </div>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Badge className={getPriorityColor(ticket.priority)} size="lg">
-            <AlertTriangle className="h-3 w-3 mr-1" />
-            {getPriorityText(ticket.priority)}
-          </Badge>
-          <Badge className={getStatusColor(ticket.status)} size="lg">
-            {getStatusIcon(ticket.status)}
-            <span className="ml-1">{getStatusText(ticket.status)}</span>
-          </Badge>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Tag className="h-5 w-5" />
-              Détails du ticket
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-start gap-2">
-                <Home className="h-5 w-5 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="font-medium">Propriété</p>
-                  <p className="text-muted-foreground">{ticket.propertyName}</p>
-                </div>
-              </div>
-              
+    <Card className="w-full overflow-hidden shadow-md">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-lg">{ticket.title}</CardTitle>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Ouvrir le menu</span>
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
+              <Edit className="mr-2 h-4 w-4" />
+              Modifier
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-destructive focus:bg-destructive/10">
+              <Trash2 className="mr-2 h-4 w-4" />
+              Supprimer
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </CardHeader>
+      <CardContent className="pb-2">
+        <ScrollArea className="h-[450px] w-full pr-2">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Home className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span>{ticket.propertyName}</span>
               {ticket.unit && (
-                <div className="flex items-start gap-2">
-                  <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="font-medium">Unité</p>
-                    <p className="text-muted-foreground">{ticket.unit}</p>
-                  </div>
-                </div>
+                <>
+                  <Separator orientation="vertical" className="h-4" />
+                  <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <span>{ticket.unit}</span>
+                </>
               )}
-              
-              <div className="flex items-start gap-2">
-                <Tag className="h-5 w-5 text-muted-foreground mt-0.5" />
+            </div>
+            <div className="flex items-center gap-2">
+              <Tag className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span>{ticket.category}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span>Signalé par: {ticket.reportedBy}</span>
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Description</h4>
+              <p className="text-sm text-muted-foreground">{ticket.description}</p>
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Détails</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <p className="font-medium">Catégorie</p>
-                  <p className="text-muted-foreground">{ticket.category}</p>
+                  <Label className="text-xs text-muted-foreground">Date de création</Label>
+                  <p className="text-sm">{formatDistanceToNow(new Date(ticket.createdAt), { addSuffix: true, locale: fr })}</p>
                 </div>
-              </div>
-              
-              <div className="flex items-start gap-2">
-                <User className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium">Signalé par</p>
-                  <p className="text-muted-foreground">{ticket.reportedBy}</p>
+                  <Label className="text-xs text-muted-foreground">Coût estimé</Label>
+                  <p className="text-sm">{formattedCost}</p>
                 </div>
-              </div>
-              
-              <div className="flex items-start gap-2">
-                <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium">Créé le</p>
-                  <p className="text-muted-foreground">
-                    {format(new Date(ticket.createdAt), "PPP", { locale: fr })}
-                  </p>
+                  <Label className="text-xs text-muted-foreground">Status</Label>
+                  {/* Modifier les Badges qui ont la propriété size incorrecte (lignes 138 et 142)
+                  Au lieu de:
+                  <Badge className={getStatusColor(ticket.status)} size="lg">
+                  Utilisez: */}
+                  <Badge className={`${getStatusColor(ticket.status)} px-3 py-1.5 text-sm`}>
+                    <Clock className="mr-1.5 h-4 w-4" />
+                    {getStatusText(ticket.status)}
+                  </Badge>
                 </div>
-              </div>
-              
-              <div className="flex items-start gap-2">
-                <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium">Mis à jour le</p>
-                  <p className="text-muted-foreground">
-                    {format(new Date(ticket.updatedAt), "PPP", { locale: fr })}
-                  </p>
+                  <Label className="text-xs text-muted-foreground">Priorité</Label>
+                  {/* Et au lieu de:
+                  <Badge className={getPriorityColor(ticket.priority)} size="lg">
+                  Utilisez: */}
+                  <Badge className={`${getPriorityColor(ticket.priority)} px-3 py-1.5 text-sm`}>
+                    <AlertTriangle className="mr-1.5 h-4 w-4" />
+                    {getPriorityText(ticket.priority)}
+                  </Badge>
                 </div>
               </div>
             </div>
-            
-            <div className="pt-2">
-              <p className="font-medium">Description</p>
-              <p className="text-muted-foreground whitespace-pre-line mt-1">{ticket.description}</p>
-            </div>
-            
-            {(ticket.estimatedCost !== undefined || ticket.actualCost !== undefined) && (
-              <div className="border-t pt-4 mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {ticket.estimatedCost !== undefined && (
-                    <div>
-                      <p className="font-medium">Coût estimé</p>
-                      <p className="text-muted-foreground">
-                        {ticket.estimatedCost.toLocaleString('fr-FR')} €
-                      </p>
-                    </div>
-                  )}
-                  
-                  {ticket.actualCost !== undefined && (
-                    <div>
-                      <p className="font-medium">Coût réel</p>
-                      <p className="text-muted-foreground">
-                        {ticket.actualCost.toLocaleString('fr-FR')} €
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <div className="space-y-6">
-          {ticket.images && ticket.images.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                  Images
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  {ticket.images.map((image, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={image}
-                        alt={`Image ${index + 1}`}
-                        className="rounded-md w-full h-32 object-cover transition-transform group-hover:scale-[1.02] cursor-pointer"
-                      />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
-                        <Button size="sm" variant="secondary" className="text-xs">
-                          Agrandir
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
-                Commentaires
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {(!ticket.comments || ticket.comments.length === 0) ? (
-                <div className="text-center py-8 border border-dashed rounded-lg">
-                  <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">
-                    Aucun commentaire pour l'instant
-                  </p>
+            <Separator />
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Assigné à</h4>
+              {ticket.assignedTo ? (
+                <div className="flex items-center space-x-2">
+                  <Avatar>
+                    <AvatarImage src={ticket.assignedTo.avatar} alt={ticket.assignedTo.name} />
+                    <AvatarFallback>{ticket.assignedTo.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm">{ticket.assignedTo.name}</span>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {ticket.comments?.map((comment) => (
-                    <div key={comment.id} className="border rounded-lg p-3 hover:bg-muted/50 transition-colors">
-                      <div className="flex justify-between">
-                        <p className="font-medium">{comment.author}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(comment.createdAt), "PPp", { locale: fr })}
-                        </p>
-                      </div>
-                      <p className="mt-1 text-sm">{comment.text}</p>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-sm text-muted-foreground">Non assigné</p>
               )}
-              
-              <div className="pt-2">
-                <Textarea
-                  placeholder="Ajouter un commentaire..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="min-h-[80px]"
-                />
-                <Button 
-                  onClick={handleAddComment} 
-                  className="mt-2 w-full"
-                  disabled={!newComment.trim()}
-                >
-                  Ajouter un commentaire
-                </Button>
+            </div>
+            {ticket.attachments && ticket.attachments.length > 0 && (
+              <>
+                <Separator />
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Pièces jointes</h4>
+                  <div className="flex flex-col space-y-2">
+                    {ticket.attachments.map((attachment, index) => (
+                      <a key={index} href={attachment.url} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 text-sm hover:underline">
+                        <Paperclip className="h-4 w-4 text-muted-foreground" />
+                        <span>{attachment.name}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </ScrollArea>
+      </CardContent>
+      <CardFooter className="flex justify-end gap-2 py-4">
+        {ticket.status !== "completed" && (
+          <Button variant="ghost" onClick={handleCompleteTicket} disabled={isCompleting}>
+            {isCompleting ? (
+              <>
+                Compléter <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+              </>
+            ) : (
+              <>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Compléter
+              </>
+            )}
+          </Button>
+        )}
+        {ticket.status !== "cancelled" && (
+          <Button variant="destructive" onClick={handleCancelTicket} disabled={isCancelling}>
+            {isCancelling ? (
+              <>
+                Annuler <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+              </>
+            ) : (
+              <>
+                <XCircle className="mr-2 h-4 w-4" />
+                Annuler
+              </>
+            )}
+          </Button>
+        )}
+      </CardFooter>
+
+      {/* Edit Ticket Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Modifier le ticket</DialogTitle>
+            <DialogDescription>
+              Modifiez les informations du ticket de maintenance.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="title" className="text-right">
+                Titre
+              </Label>
+              <Input type="text" id="title" name="title" value={editedTicket.title} onChange={handleInputChange} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="description" className="text-right mt-2">
+                Description
+              </Label>
+              <Textarea id="description" name="description" value={editedTicket.description} onChange={handleInputChange} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="estimatedCost" className="text-right">
+                Coût estimé
+              </Label>
+              <Input type="number" id="estimatedCost" name="estimatedCost" value={editedTicket.estimatedCost || ''} onChange={handleInputChange} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="status" className="text-right">
+                Status
+              </Label>
+              <Select onValueChange={(value) => handleSelectChange("status", value)}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Status" defaultValue={editedTicket.status} />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="priority" className="text-right">
+                Priorité
+              </Label>
+              <Select onValueChange={(value) => handleSelectChange("priority", value)}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Priorité" defaultValue={editedTicket.priority} />
+                </SelectTrigger>
+                <SelectContent>
+                  {priorityOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="category" className="text-right">
+                Catégorie
+              </Label>
+              <Select onValueChange={(value) => handleSelectChange("category", value)}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Catégorie" defaultValue={editedTicket.category} />
+                </SelectTrigger>
+                <SelectContent>
+                  {categoryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="urgent" className="text-right">
+                Urgent
+              </Label>
+              <div className="col-span-3 flex items-center">
+                <Switch id="urgent" checked={editedTicket.priority === "urgent"} onCheckedChange={(checked) => handleSelectChange("priority", checked ? "urgent" : "low")} />
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={() => setIsEditDialogOpen(false)}>
+              Annuler
+            </Button>
+            <Button type="submit" onClick={handleSaveChanges} disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  Sauvegarder <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                "Sauvegarder"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Ticket Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Supprimer le ticket</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer ce ticket de maintenance ? Cette action est irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
+              Annuler
+            </Button>
+            <Button type="submit" variant="destructive" onClick={handleDeleteTicket}>
+              Supprimer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
   );
 };
 

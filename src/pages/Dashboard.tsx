@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -12,6 +13,10 @@ import {
   Wrench,
   FileText,
   Check,
+  BarChart3,
+  LineChart as LineChartIcon,
+  PlusCircle,
+  Activity,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,6 +37,8 @@ import {
   BarChart,
   Bar,
   Legend,
+  Area,
+  AreaChart,
 } from "recharts";
 
 const cashflowData = [
@@ -154,20 +161,25 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Tableau de bord</h1>
-          <p className="text-muted-foreground">
-            Bienvenue sur votre tableau de bord de gestion immobilière.
-          </p>
+      {/* Header Section with Improved Design */}
+      <div className="rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 mb-8">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-primary">Tableau de bord</h1>
+            <p className="text-muted-foreground max-w-xl mt-2">
+              Bienvenue sur votre tableau de bord de gestion immobilière. Retrouvez ici toutes les informations importantes sur vos propriétés.
+            </p>
+          </div>
+          <Link to="/properties/add">
+            <Button className="animate-fade-in shadow-md group transition-all duration-300 hover:translate-y-[-2px]">
+              <PlusCircle className="mr-1 h-4 w-4 transition-transform group-hover:scale-110" />
+              Ajouter une propriété
+            </Button>
+          </Link>
         </div>
-        <Link to="/properties">
-          <Button className="animate-fade-in shadow-sm">
-            + Ajouter une propriété
-          </Button>
-        </Link>
       </div>
 
+      {/* Stats Cards with Enhanced Animation and Visual Effect */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total des revenus"
@@ -175,14 +187,14 @@ const Dashboard = () => {
           icon={<Euro className="h-5 w-5" />}
           description="Revenus du mois en cours"
           trend={{ value: 12, isPositive: true }}
-          className="animate-fade-in"
+          className="animate-fade-in shadow-sm hover:shadow-md transition-all duration-300"
         />
         <StatCard
           title="Propriétés"
           value="8"
           icon={<Home className="h-5 w-5" />}
           description="Dont 2 en maintenance"
-          className="animate-fade-in [animation-delay:100ms]"
+          className="animate-fade-in [animation-delay:100ms] shadow-sm hover:shadow-md transition-all duration-300"
         />
         <StatCard
           title="Locataires"
@@ -190,7 +202,7 @@ const Dashboard = () => {
           icon={<Users className="h-5 w-5" />}
           description="3 nouveaux ce mois-ci"
           trend={{ value: 8, isPositive: true }}
-          className="animate-fade-in [animation-delay:200ms]"
+          className="animate-fade-in [animation-delay:200ms] shadow-sm hover:shadow-md transition-all duration-300"
         />
         <StatCard
           title="Taux d'occupation"
@@ -198,63 +210,134 @@ const Dashboard = () => {
           icon={<TrendingUp className="h-5 w-5" />}
           description="Augmentation de 6%"
           trend={{ value: 6, isPositive: true }}
-          className="animate-fade-in [animation-delay:300ms]"
+          className="animate-fade-in [animation-delay:300ms] shadow-sm hover:shadow-md transition-all duration-300"
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-7">
-        <Card className="lg:col-span-5 animate-fade-in [animation-delay:200ms]">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <div>
-              <CardTitle>Performance financière</CardTitle>
+      {/* Charts Section with Improved Visual Design */}
+      <div className="grid gap-6 lg:grid-cols-7">
+        <Card className="lg:col-span-5 animate-fade-in [animation-delay:200ms] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 bg-background/50">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Performance financière
+              </CardTitle>
               <CardDescription>
                 Suivi des revenus et dépenses de vos propriétés
               </CardDescription>
             </div>
-            <Tabs defaultValue="month" onValueChange={setSelectedPeriod}>
-              <TabsList>
-                <TabsTrigger value="week">Semaine</TabsTrigger>
-                <TabsTrigger value="month">Mois</TabsTrigger>
-                <TabsTrigger value="year">Année</TabsTrigger>
+            <Tabs defaultValue="month" onValueChange={setSelectedPeriod} className="h-9">
+              <TabsList className="bg-background/90 backdrop-blur-sm">
+                <TabsTrigger value="week" className="text-xs sm:text-sm">Semaine</TabsTrigger>
+                <TabsTrigger value="month" className="text-xs sm:text-sm">Mois</TabsTrigger>
+                <TabsTrigger value="year" className="text-xs sm:text-sm">Année</TabsTrigger>
               </TabsList>
             </Tabs>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={cashflowData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+          <CardContent className="pt-4">
+            <ResponsiveContainer width="100%" height={320}>
+              <AreaChart data={cashflowData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="revenusGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="depensesGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--muted))" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="hsl(var(--muted))" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `${value}€`} />
-                <Tooltip formatter={(value) => [`${value} €`, undefined]} />
-                <Legend />
-                <Bar dataKey="revenus" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="dépenses" fill="hsl(var(--muted))" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tickFormatter={(value) => `${value}€`}
+                  orientation={isDesktop ? "left" : "right"} 
+                />
+                <Tooltip 
+                  formatter={(value) => [`${value} €`, undefined]} 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    borderColor: 'hsl(var(--border))',
+                    borderRadius: 'var(--radius)' 
+                  }}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '10px' }}
+                  formatter={(value) => <span className="capitalize font-medium">{value}</span>}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="revenus" 
+                  stroke="hsl(var(--primary))" 
+                  fillOpacity={1} 
+                  fill="url(#revenusGradient)" 
+                  strokeWidth={2}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="dépenses" 
+                  stroke="hsl(var(--muted-foreground))" 
+                  fillOpacity={1} 
+                  fill="url(#depensesGradient)" 
+                  strokeWidth={2}
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 animate-fade-in [animation-delay:300ms]">
-          <CardHeader>
-            <CardTitle>Taux d'occupation</CardTitle>
+        <Card className="lg:col-span-2 animate-fade-in [animation-delay:300ms] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+          <CardHeader className="bg-background/50">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <LineChartIcon className="h-5 w-5 text-primary" />
+              Taux d'occupation
+            </CardTitle>
             <CardDescription>
               Évolution sur les 6 derniers mois
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+          <CardContent className="pt-4">
+            <ResponsiveContainer width="100%" height={320}>
               <LineChart data={occupancyData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <defs>
+                  <linearGradient id="occupancyGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} domain={[50, 100]} tickFormatter={(value) => `${value}%`} />
-                <Tooltip formatter={(value) => [`${value}%`, "Taux d'occupation"]} />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  domain={[80, 100]} 
+                  tickFormatter={(value) => `${value}%`} 
+                  orientation={isDesktop ? "right" : "left"}
+                />
+                <Tooltip 
+                  formatter={(value) => [`${value}%`, "Taux d'occupation"]} 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    borderColor: 'hsl(var(--border))',
+                    borderRadius: 'var(--radius)' 
+                  }}
+                />
                 <Line
                   type="monotone"
                   dataKey="taux"
                   stroke="hsl(var(--primary))"
-                  strokeWidth={2}
-                  dot={{ r: 4, fill: "hsl(var(--primary))" }}
-                  activeDot={{ r: 6 }}
+                  strokeWidth={3}
+                  dot={{ r: 6, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "hsl(var(--background))" }}
+                  activeDot={{ r: 8, strokeWidth: 0 }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="taux" 
+                  fill="url(#occupancyGradient)" 
+                  strokeWidth={0}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -262,10 +345,14 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2 animate-fade-in [animation-delay:400ms]">
-          <CardHeader>
-            <CardTitle>Propriétés récentes</CardTitle>
+      {/* Property and Activity Cards with Enhanced Visual Design */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2 animate-fade-in [animation-delay:400ms] shadow-sm hover:shadow-md transition-all duration-300">
+          <CardHeader className="bg-background/50">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Home className="h-5 w-5 text-primary" /> 
+              Propriétés récentes
+            </CardTitle>
             <CardDescription>
               Aperçu de vos dernières propriétés ajoutées
             </CardDescription>
@@ -277,22 +364,26 @@ const Dashboard = () => {
               ))}
             </div>
             <Link to="/properties">
-              <Button variant="outline" className="mt-6 w-full">
+              <Button variant="outline" className="mt-6 w-full group hover:bg-primary/5">
                 Voir toutes les propriétés
+                <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
           </CardContent>
         </Card>
 
-        <Card className="animate-fade-in [animation-delay:500ms]">
-          <CardHeader>
-            <CardTitle>Activité récente</CardTitle>
+        <Card className="animate-fade-in [animation-delay:500ms] shadow-sm hover:shadow-md transition-all duration-300">
+          <CardHeader className="bg-background/50">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Activity className="h-5 w-5 text-primary" />
+              Activité récente
+            </CardTitle>
             <CardDescription>
               Dernières activités sur votre compte
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {recentActivities.map((activity, index) => (
                 <RecentActivityItem
                   key={index}
@@ -305,8 +396,9 @@ const Dashboard = () => {
                 />
               ))}
             </div>
-            <Button variant="outline" className="mt-6 w-full">
+            <Button variant="outline" className="mt-6 w-full group hover:bg-primary/5">
               Voir toutes les activités
+              <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </CardContent>
         </Card>
