@@ -62,6 +62,7 @@ const UploadDocumentDialog = ({ open, onOpenChange, onUpload }: UploadDocumentDi
     // Simuler un téléchargement
     setTimeout(() => {
       const fileExtension = selectedFile.name.split('.').pop() || "";
+      const today = new Date().toISOString().split('T')[0];
       
       const newDocument: Document = {
         id: `doc${Date.now()}`,
@@ -69,7 +70,8 @@ const UploadDocumentDialog = ({ open, onOpenChange, onUpload }: UploadDocumentDi
         type: fileExtension,
         size: formatFileSize(selectedFile.size),
         uploadedBy: "Jean Dupont", // Normalement l'utilisateur connecté
-        uploadDate: new Date().toISOString().split('T')[0],
+        uploadDate: today,
+        date: today, // Add the date field to match the Document interface
         category: category,
       };
 

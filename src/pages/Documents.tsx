@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Plus, 
@@ -28,6 +29,7 @@ export interface Document {
   size: string;
   uploadedBy: string;
   uploadDate: string;
+  date: string; // Added this field to match DocumentList.tsx
   category: string;
   propertyId?: string;
   tenantId?: string;
@@ -41,6 +43,7 @@ const mockDocuments: Document[] = [
     size: "1.2 MB",
     uploadedBy: "Jean Dupont",
     uploadDate: "2023-06-15",
+    date: "2023-06-15", // Set date to match uploadDate
     category: "contrats",
     propertyId: "prop1",
     tenantId: "tenant2"
@@ -52,6 +55,7 @@ const mockDocuments: Document[] = [
     size: "843 KB",
     uploadedBy: "Marie Martin",
     uploadDate: "2023-07-02",
+    date: "2023-07-02", // Set date to match uploadDate
     category: "factures",
     propertyId: "prop3"
   },
@@ -62,6 +66,7 @@ const mockDocuments: Document[] = [
     size: "1.5 MB",
     uploadedBy: "Jean Dupont",
     uploadDate: "2023-05-20",
+    date: "2023-05-20", // Set date to match uploadDate
     category: "états des lieux",
     propertyId: "prop2"
   },
@@ -72,6 +77,7 @@ const mockDocuments: Document[] = [
     size: "356 KB",
     uploadedBy: "System",
     uploadDate: "2023-06-01",
+    date: "2023-06-01", // Set date to match uploadDate
     category: "quittances",
     propertyId: "prop1",
     tenantId: "tenant1"
@@ -83,6 +89,7 @@ const mockDocuments: Document[] = [
     size: "4.2 MB",
     uploadedBy: "Marie Martin",
     uploadDate: "2023-06-10",
+    date: "2023-06-10", // Set date to match uploadDate
     category: "photos",
     propertyId: "prop1"
   },
@@ -93,6 +100,7 @@ const mockDocuments: Document[] = [
     size: "980 KB",
     uploadedBy: "Jean Dupont",
     uploadDate: "2023-07-10",
+    date: "2023-07-10", // Set date to match uploadDate
     category: "relevés",
   },
   {
@@ -102,6 +110,7 @@ const mockDocuments: Document[] = [
     size: "750 KB",
     uploadedBy: "Admin",
     uploadDate: "2023-01-15",
+    date: "2023-01-15", // Set date to match uploadDate
     category: "règlements",
   },
 ];

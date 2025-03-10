@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { AlertTriangle, Calendar, Edit, Home, MapPin, MessageSquare, Tag, Tool, Trash2, User } from "lucide-react";
+import { AlertTriangle, Calendar, Edit, Home, MapPin, MessageSquare, Tag, Wrench, Trash2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
