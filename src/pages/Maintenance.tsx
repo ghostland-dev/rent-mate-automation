@@ -24,7 +24,11 @@ const Maintenance = () => {
     handleCreateTicket,
     handleUpdateTicket,
     handleDeleteTicket,
+    handleTogglePin,
   } = useMaintenance();
+
+  // Count pinned tickets
+  const pinnedCount = filteredTickets.filter(ticket => ticket.pinned).length;
 
   if (isLoading) {
     return <LoadingState />;
@@ -37,13 +41,17 @@ const Maintenance = () => {
         onUpdate={handleUpdateTicket}
         onDelete={handleDeleteTicket}
         onClose={() => setSelectedTicket(null)}
+        onTogglePin={() => handleTogglePin(selectedTicket.id)}
       />
     );
   }
 
   return (
     <div className="space-y-6">
-      <MaintenanceHeader onCreateClick={() => setIsCreating(true)} />
+      <MaintenanceHeader 
+        onCreateClick={() => setIsCreating(true)} 
+        pinnedCount={pinnedCount}
+      />
       
       <MaintenanceFilters onFilterChange={handleFilterChange} />
       

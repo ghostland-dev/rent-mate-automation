@@ -88,6 +88,7 @@ export const useMaintenance = () => {
       category: data.category,
       estimatedCost: data.estimatedCost,
       images: data.images,
+      pinned: false, // Initialize as not pinned
     };
 
     setTickets([newTicket, ...tickets]);
@@ -128,6 +129,30 @@ export const useMaintenance = () => {
     });
   };
 
+  const handleTogglePin = (id: string) => {
+    const updatedTickets = tickets.map((ticket) =>
+      ticket.id === id ? { ...ticket, pinned: !ticket.pinned } : ticket
+    );
+    
+    setTickets(updatedTickets);
+    setFilteredTickets(
+      filteredTickets.map((ticket) =>
+        ticket.id === id ? { ...ticket, pinned: !ticket.pinned } : ticket
+      )
+    );
+    
+    // If the selected ticket is the one being pinned/unpinned, update it too
+    if (selectedTicket && selectedTicket.id === id) {
+      setSelectedTicket({ ...selectedTicket, pinned: !selectedTicket.pinned });
+    }
+
+    toast({
+      description: updatedTickets.find(t => t.id === id)?.pinned 
+        ? "Le ticket a été épinglé avec succès."
+        : "Le ticket a été détaché avec succès.",
+    });
+  };
+
   return {
     tickets,
     filteredTickets,
@@ -145,5 +170,6 @@ export const useMaintenance = () => {
     handleCreateTicket,
     handleUpdateTicket,
     handleDeleteTicket,
+    handleTogglePin,
   };
 };

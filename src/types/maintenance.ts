@@ -40,6 +40,7 @@ export type MaintenanceTicket = {
   images?: string[];
   attachments?: Attachment[];
   comments?: Comment[];
+  pinned?: boolean; // New property for pinned status
 };
 
 export const MAINTENANCE_CATEGORIES = [

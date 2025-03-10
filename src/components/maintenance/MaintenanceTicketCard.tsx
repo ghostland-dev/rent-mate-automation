@@ -11,7 +11,8 @@ import {
   MapPin, 
   Tag, 
   Wrench, 
-  User
+  User,
+  Pin
 } from "lucide-react";
 
 interface MaintenanceTicketCardProps {
@@ -78,7 +79,7 @@ export const MaintenanceTicketCard = ({ ticket, onClick }: MaintenanceTicketCard
 
   return (
     <Card 
-      className="overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer border-l-4"
+      className={`overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer border-l-4 ${ticket.pinned ? 'ring-2 ring-primary ring-offset-2' : ''}`}
       style={{ 
         borderLeftColor: 
           ticket.priority === "urgent" ? "rgb(220, 38, 38)" : 
@@ -90,7 +91,12 @@ export const MaintenanceTicketCard = ({ ticket, onClick }: MaintenanceTicketCard
     >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg line-clamp-1">{ticket.title}</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-lg line-clamp-1">{ticket.title}</CardTitle>
+            {ticket.pinned && (
+              <Pin className="h-4 w-4 text-primary" fill="currentColor" />
+            )}
+          </div>
           <Badge className={getPriorityColor(ticket.priority)}>
             {getPriorityText(ticket.priority)}
           </Badge>

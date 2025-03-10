@@ -1,54 +1,47 @@
 
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CardFooter } from "@/components/ui/card";
+import { Pencil, Trash2, Pin, PinOff } from "lucide-react";
+import { MaintenanceTicket } from "@/types/maintenance";
 
 interface TicketActionsProps {
-  status: string;
-  onComplete: () => void;
-  onCancel: () => void;
-  isCompleting: boolean;
-  isCancelling: boolean;
+  ticket: MaintenanceTicket;
+  onEdit: () => void;
+  onDelete: () => void;
+  onTogglePin: () => void;
 }
 
-const TicketActions = ({ 
-  status, 
-  onComplete, 
-  onCancel, 
-  isCompleting, 
-  isCancelling 
-}: TicketActionsProps) => {
+const TicketActions = ({ ticket, onEdit, onDelete, onTogglePin }: TicketActionsProps) => {
   return (
-    <CardFooter className="flex justify-end gap-2 py-4">
-      {status !== "completed" && (
-        <Button variant="ghost" onClick={onComplete} disabled={isCompleting}>
-          {isCompleting ? (
-            <>
-              Compléter <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-            </>
-          ) : (
-            <>
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Compléter
-            </>
-          )}
-        </Button>
-      )}
-      {status !== "cancelled" && (
-        <Button variant="destructive" onClick={onCancel} disabled={isCancelling}>
-          {isCancelling ? (
-            <>
-              Annuler <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-            </>
-          ) : (
-            <>
-              <XCircle className="mr-2 h-4 w-4" />
-              Annuler
-            </>
-          )}
-        </Button>
-      )}
-    </CardFooter>
+    <div className="flex items-center gap-2">
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={onTogglePin} 
+        className="flex items-center gap-1" 
+        title={ticket.pinned ? "Détacher le ticket" : "Épingler le ticket"}
+      >
+        {ticket.pinned ? (
+          <>
+            <PinOff className="h-4 w-4" />
+            <span className="hidden sm:inline">Détacher</span>
+          </>
+        ) : (
+          <>
+            <Pin className="h-4 w-4" />
+            <span className="hidden sm:inline">Épingler</span>
+          </>
+        )}
+      </Button>
+      <Button variant="outline" size="sm" onClick={onEdit} className="flex items-center gap-1">
+        <Pencil className="h-4 w-4" />
+        <span className="hidden sm:inline">Modifier</span>
+      </Button>
+      <Button variant="destructive" size="sm" onClick={onDelete} className="flex items-center gap-1">
+        <Trash2 className="h-4 w-4" />
+        <span className="hidden sm:inline">Supprimer</span>
+      </Button>
+    </div>
   );
 };
 

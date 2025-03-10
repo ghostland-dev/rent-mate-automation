@@ -16,6 +16,7 @@ export const MOCK_TICKETS: MaintenanceTicket[] = [
     reportedBy: "Jean Dupont",
     category: "Plomberie",
     estimatedCost: 150,
+    pinned: true, // This ticket is pinned
     images: [
       "https://images.unsplash.com/photo-1603302576837-37561b2e2302?q=80&w=300&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?q=80&w=300&auto=format&fit=crop"
@@ -43,6 +44,7 @@ export const MOCK_TICKETS: MaintenanceTicket[] = [
     reportedBy: "Pierre Durand",
     category: "Chauffage/Climatisation",
     estimatedCost: 250,
+    pinned: false,
     images: [
       "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=300&auto=format&fit=crop"
     ]
@@ -59,7 +61,8 @@ export const MOCK_TICKETS: MaintenanceTicket[] = [
     updatedAt: "2023-07-08T15:45:00Z",
     reportedBy: "Admin",
     category: "Serrurerie",
-    estimatedCost: 120
+    estimatedCost: 120,
+    pinned: true, // This ticket is pinned
   },
   {
     id: "ticket4",
@@ -74,7 +77,8 @@ export const MOCK_TICKETS: MaintenanceTicket[] = [
     reportedBy: "Admin",
     category: "Nettoyage",
     estimatedCost: 180,
-    actualCost: 150
+    actualCost: 150,
+    pinned: false,
   },
   {
     id: "ticket5",
@@ -89,6 +93,7 @@ export const MOCK_TICKETS: MaintenanceTicket[] = [
     reportedBy: "Admin",
     category: "Peinture",
     estimatedCost: 1200,
+    pinned: false,
     images: [
       "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=300&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=300&auto=format&fit=crop"
@@ -106,7 +111,8 @@ export const MOCK_TICKETS: MaintenanceTicket[] = [
     updatedAt: "2023-07-02T11:15:00Z",
     reportedBy: "Admin",
     category: "Autre",
-    estimatedCost: 15000
+    estimatedCost: 15000,
+    pinned: false,
   }
 ];
 
