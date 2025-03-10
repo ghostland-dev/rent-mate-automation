@@ -49,19 +49,50 @@ export const MaintenanceTicketCard = ({ ticket, onClick }: MaintenanceTicketCard
     locale: fr
   });
 
+  // Format the estimated cost 
+  const formattedCost = ticket.estimatedCost ? 
+    ticket.estimatedCost.toLocaleString('fr-FR') + ' €' : 
+    'Non spécifié';
+
+  // Get status and priority translations
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "completed": return "Terminé";
+      case "in_progress": return "En cours";
+      case "pending": return "En attente";
+      case "scheduled": return "Programmé";
+      case "cancelled": return "Annulé";
+      default: return status;
+    }
+  };
+
+  const getPriorityText = (priority: string) => {
+    switch (priority) {
+      case "urgent": return "Urgent";
+      case "high": return "Élevé";
+      case "medium": return "Moyen";
+      case "low": return "Faible";
+      default: return priority;
+    }
+  };
+
   return (
     <Card 
-      className="overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+      className="overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer border-l-4"
+      style={{ 
+        borderLeftColor: 
+          ticket.priority === "urgent" ? "rgb(220, 38, 38)" : 
+          ticket.priority === "high" ? "rgb(234, 88, 12)" : 
+          ticket.priority === "medium" ? "rgb(234, 179, 8)" : 
+          "rgb(22, 163, 74)" 
+      }}
       onClick={onClick}
     >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg line-clamp-1">{ticket.title}</CardTitle>
           <Badge className={getPriorityColor(ticket.priority)}>
-            {ticket.priority === "urgent" && "Urgent"}
-            {ticket.priority === "high" && "Élevé"}
-            {ticket.priority === "medium" && "Moyen"}
-            {ticket.priority === "low" && "Faible"}
+            {getPriorityText(ticket.priority)}
           </Badge>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -92,19 +123,16 @@ export const MaintenanceTicketCard = ({ ticket, onClick }: MaintenanceTicketCard
           <p className="text-sm line-clamp-2 text-muted-foreground">{ticket.description}</p>
         </div>
       </CardContent>
-      <CardFooter className="pt-1 flex justify-between">
+      <CardFooter className="pt-1 flex justify-between items-center">
         <Badge className={getStatusColor(ticket.status)}>
-          {ticket.status === "completed" && "Terminé"}
-          {ticket.status === "in_progress" && "En cours"}
-          {ticket.status === "pending" && "En attente"}
-          {ticket.status === "scheduled" && "Programmé"}
-          {ticket.status === "cancelled" && "Annulé"}
+          {getStatusText(ticket.status)}
         </Badge>
-        {ticket.estimatedCost && (
+        <div className="flex items-center gap-1">
+          <Wrench className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">
-            {ticket.estimatedCost.toLocaleString('fr-FR')} €
+            {formattedCost}
           </span>
-        )}
+        </div>
       </CardFooter>
     </Card>
   );
