@@ -213,31 +213,14 @@ const Maintenance = () => {
     });
   };
 
-  const handleUpdateTicket = (data: any) => {
-    if (!selectedTicket) return;
-
-    const updatedTicket: MaintenanceTicket = {
-      ...selectedTicket,
-      title: data.title,
-      description: data.description,
-      propertyId: data.propertyId,
-      propertyName: properties.find(p => p.id === data.propertyId)?.name || selectedTicket.propertyName,
-      unit: data.unit,
-      status: data.status,
-      priority: data.priority,
-      updatedAt: new Date().toISOString(),
-      category: data.category,
-      estimatedCost: data.estimatedCost,
-      images: data.images,
-    };
-
+  const handleUpdateTicket = (updatedTicket: MaintenanceTicket) => {
     const updatedTickets = tickets.map((ticket) =>
-      ticket.id === selectedTicket.id ? updatedTicket : ticket
+      ticket.id === updatedTicket.id ? updatedTicket : ticket
     );
     setTickets(updatedTickets);
     setFilteredTickets(
       filteredTickets.map((ticket) =>
-        ticket.id === selectedTicket.id ? updatedTicket : ticket
+        ticket.id === updatedTicket.id ? updatedTicket : ticket
       )
     );
     setSelectedTicket(updatedTicket);
@@ -248,12 +231,10 @@ const Maintenance = () => {
     });
   };
 
-  const handleDeleteTicket = () => {
-    if (!selectedTicket) return;
-
-    const updatedTickets = tickets.filter((ticket) => ticket.id !== selectedTicket.id);
+  const handleDeleteTicket = (id: string) => {
+    const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
     setTickets(updatedTickets);
-    setFilteredTickets(filteredTickets.filter((ticket) => ticket.id !== selectedTicket.id));
+    setFilteredTickets(filteredTickets.filter((ticket) => ticket.id !== id));
     setSelectedTicket(null);
 
     toast({
