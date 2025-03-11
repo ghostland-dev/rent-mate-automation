@@ -21,6 +21,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Documents from "./pages/Documents";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
+import IndexPage from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -32,12 +33,15 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            {/* Public landing page */}
+            <Route path="/" element={<IndexPage />} />
+            
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
             {/* Protected routes */}
-            <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+            <Route path="/dashboard" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
               <Route path="properties" element={<Properties />} />
               <Route path="properties/:id" element={<PropertyDetail />} />
@@ -52,7 +56,7 @@ const App = () => (
               <Route path="messages" element={<Dashboard />} />
             </Route>
             
-            {/* Redirect to login */}
+            {/* Redirect to index */}
             <Route path="/index" element={<Navigate to="/" replace />} />
             
             {/* Route 404 */}
