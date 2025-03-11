@@ -144,3 +144,38 @@
     @apply bg-primary/70;
   }
 }
+
+/* SaaS-specific styles */
+@layer components {
+  .saas-hero {
+    @apply relative overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20;
+  }
+
+  .saas-section {
+    @apply py-16 md:py-24;
+  }
+
+  .saas-card {
+    @apply bg-white dark:bg-black/20 shadow-md hover:shadow-lg transition-all duration-300 border border-border/50 rounded-xl overflow-hidden;
+  }
+
+  .saas-gradient-text {
+    @apply bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent;
+  }
+
+  .saas-button {
+    @apply rounded-full shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+
+  .feature-card {
+    @apply p-6 rounded-xl border border-border/50 bg-white/50 dark:bg-black/20 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .feature-icon {
+    @apply p-3 rounded-full bg-primary/10 text-primary mb-4;
+  }
+}
