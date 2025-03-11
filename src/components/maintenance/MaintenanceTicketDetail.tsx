@@ -1,28 +1,25 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { MaintenanceTicket } from "@/types/maintenance";
 import TicketHeader from "./TicketHeader";
-import TicketBasicInfo from "./TicketBasicInfo";
-import TicketDescription from "./TicketDescription";
-import TicketDetails from "./TicketDetails";
-import TicketAssignee from "./TicketAssignee";
-import TicketAttachments from "./TicketAttachments";
 import TicketActions from "./TicketActions";
-import TicketComments from "./TicketComments";
-import TicketParameters from "./TicketParameters";
-import EditTicketDialog from "./EditTicketDialog";
-import DeleteTicketDialog from "./DeleteTicketDialog";
+import TicketTabs from "./ticket-detail/TicketTabs";
+import TicketContent from "./ticket-detail/TicketContent";
+import TicketDetailsTab from "./ticket-detail/TicketDetailsTab";
+import TicketMessagesTab from "./ticket-detail/TicketMessagesTab";
+import TicketParametersTab from "./ticket-detail/TicketParametersTab";
+import TicketStatusActions from "./ticket-detail/TicketStatusActions";
+import TicketDialogs from "./ticket-detail/TicketDialogs";
 
 interface MaintenanceTicketDetailProps {
   ticket: MaintenanceTicket;
   onUpdate: (ticket: MaintenanceTicket) => void;
   onDelete: (id: string) => void;
   onClose?: () => void;
-  onTogglePin: () => void; // Added this property to fix the error
+  onTogglePin: () => void;
 }
 
 const MaintenanceTicketDetail = ({ 
@@ -127,12 +124,14 @@ const MaintenanceTicketDetail = ({
         description: "Votre message a été ajouté.",
       });
       
+      return Promise.resolve();
     } catch (error) {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de l'ajout du message.",
         variant: "destructive",
       });
+      return Promise.reject(error);
     }
   };
 
@@ -161,78 +160,27 @@ const MaintenanceTicketDetail = ({
         onClose={onClose}
       />
 
-      <div className="border-b">
-        <div className="flex">
-          <button
-            className={`px-4 py-2 text-sm font-medium ${activeTab === 'details' ? 'border-b-2 border-primary' : 'text-muted-foreground'}`}
-            onClick={() => setActiveTab('details')}
-          >
-            Détails
-          </button>
-          <button
-            className={`px-4 py-2 text-sm font-medium ${activeTab === 'messages' ? 'border-b-2 border-primary' : 'text-muted-foreground'}`}
-            onClick={() => setActiveTab('messages')}
-          >
-            Messages {ticket.comments && ticket.comments.length > 0 && `(${ticket.comments.length})`}
-          </button>
-          <button
-            className={`px-4 py-2 text-sm font-medium ${activeTab === 'parameters' ? 'border-b-2 border-primary' : 'text-muted-foreground'}`}
-            onClick={() => setActiveTab('parameters')}
-          >
-            Paramètres
-          </button>
-        </div>
-      </div>
+      <TicketTabs 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+        ticket={ticket}
+      />
 
       <CardContent className="pb-2">
-        <ScrollArea className="h-[450px] w-full pr-2">
-          {activeTab === 'details' && (
-            <div className="space-y-4">
-              <TicketBasicInfo
-                propertyName={ticket.propertyName}
-                unit={ticket.unit}
-                category={ticket.category}
-                reportedBy={ticket.reportedBy}
-              />
-              <Separator />
-              <TicketDescription description={ticket.description} />
-              <Separator />
-              <TicketDetails
-                createdAt={ticket.createdAt}
-                estimatedCost={ticket.estimatedCost}
-                status={ticket.status}
-                priority={ticket.priority}
-              />
-              <Separator />
-              <TicketAssignee assignedTo={ticket.assignedTo} />
-              {ticket.attachments && ticket.attachments.length > 0 && (
-                <>
-                  <Separator />
-                  <TicketAttachments attachments={ticket.attachments} />
-                </>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'messages' && (
-            <div className="py-4">
-              <TicketComments
-                ticket={ticket}
-                onAddComment={handleAddComment}
-              />
-            </div>
-          )}
-
-          {activeTab === 'parameters' && (
-            <div className="py-4">
-              <TicketParameters
-                ticket={ticket}
-                onUpdateParameters={handleUpdateParameters}
-              />
-            </div>
-          )}
-        </ScrollArea>
+        <TicketContent>
+          {activeTab === 'details' && <TicketDetailsTab ticket={ticket} />}
+          {activeTab === 'messages' && <TicketMessagesTab ticket={ticket} onAddComment={handleAddComment} />}
+          {activeTab === 'parameters' && <TicketParametersTab ticket={ticket} onUpdateParameters={handleUpdateParameters} />}
+        </TicketContent>
       </CardContent>
+
+      <TicketStatusActions
+        status={ticket.status}
+        onComplete={handleCompleteTicket}
+        onCancel={handleCancelTicket}
+        isCompleting={isCompleting}
+        isCancelling={isCancelling}
+      />
 
       <TicketActions
         ticket={ticket}
@@ -241,17 +189,14 @@ const MaintenanceTicketDetail = ({
         onTogglePin={onTogglePin}
       />
 
-      <EditTicketDialog
+      <TicketDialogs
         ticket={ticket}
-        isOpen={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        onSubmit={onUpdate}
-      />
-
-      <DeleteTicketDialog
-        isOpen={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        onDelete={() => handleDeleteTicket()}
+        isEditDialogOpen={isEditDialogOpen}
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsEditDialogOpen={setIsEditDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        onUpdate={onUpdate}
+        onDelete={handleDeleteTicket}
       />
     </Card>
   );
