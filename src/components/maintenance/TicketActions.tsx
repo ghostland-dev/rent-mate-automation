@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Pin, PinOff } from "lucide-react";
 import { MaintenanceTicket } from "@/types/maintenance";

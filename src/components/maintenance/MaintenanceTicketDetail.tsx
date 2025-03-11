@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -23,13 +22,15 @@ interface MaintenanceTicketDetailProps {
   onUpdate: (ticket: MaintenanceTicket) => void;
   onDelete: (id: string) => void;
   onClose?: () => void;
+  onTogglePin: () => void; // Added this property to fix the error
 }
 
 const MaintenanceTicketDetail = ({ 
   ticket, 
   onUpdate, 
   onDelete, 
-  onClose 
+  onClose,
+  onTogglePin
 }: MaintenanceTicketDetailProps) => {
   const { user } = useAuth();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -234,11 +235,10 @@ const MaintenanceTicketDetail = ({
       </CardContent>
 
       <TicketActions
-        status={ticket.status}
-        onComplete={handleCompleteTicket}
-        onCancel={handleCancelTicket}
-        isCompleting={isCompleting}
-        isCancelling={isCancelling}
+        ticket={ticket}
+        onEdit={() => setIsEditDialogOpen(true)}
+        onDelete={() => setIsDeleteDialogOpen(true)}
+        onTogglePin={onTogglePin}
       />
 
       <EditTicketDialog
